@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lão Hạc Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">🏮 Lão Hạc <span>Admin</span></div>
+    <nav>
+      <button class="tab on" data-tab="dash">Tổng quan</button>
+      <button class="tab" data-tab="episodes">Tình tiết</button>
+      <button class="tab" data-tab="test">Thử nghiệm</button>
+      <button class="tab" data-tab="settings">Cài đặt</button>
+      <button class="tab" data-tab="lines">Câu thoại</button>
+    </nav>
+    <a class="open" href="/game/" target="_blank">Mở game ↗</a>
+  </header>
+
+  <main>
+    <!-- ============================== DASHBOARD -->
+    <section id="dash" class="view on">
+      <div class="card live-conn" id="liveCard">
+        <div class="lc-head">
+          <div>
+            <div class="label">Kết nối live TikTok bằng username</div>
+            <div class="big"><span class="dot" id="dlDot"></span><span id="dlState">Chưa kết nối</span></div>
+            <div class="muted" id="dlInfo"></div>
+            <div class="err" id="dlErr"></div>
+          </div>
+          <form class="lc-form" id="dlForm" autocomplete="off">
+            <div class="lc-input"><span>@</span><input id="dlUser" list="dlRecent" placeholder="username đang live" spellcheck="false"></div>
+            <datalist id="dlRecent"></datalist>
+            <button class="btn" type="submit" id="dlConnect">Kết nối</button>
+            <button class="btn ghost danger" type="button" id="dlStop">Ngắt</button>
+          </form>
+        </div>
+        <div class="chips" id="dlChips"></div>
+        <p class="muted small">Kết nối thẳng tới live của username (không cần TikFinity). Nếu TikFinity cũng đang kết nối cùng buổi live thì mỗi quà sẽ bị tính 2 lần — hãy tắt một bên.</p>
+      </div>
+
+      <div class="grid status">
+        <div class="card">
+          <div class="label">TikFinity</div>
+          <div class="big"><span class="dot" id="tfDot"></span><span id="tfState">…</span></div>
+          <div class="muted" id="tfUrl"></div>
+          <div class="muted" id="tfInfo"></div>
+          <div class="err" id="tfErr"></div>
+          <div class="muted" id="flowInfo"></div>
+          <div class="err" id="flowWarn"></div>
+          <button id="tfReconnect" class="btn sm">Kết nối lại</button>
+        </div>
+        <div class="card">
+          <div class="label">Màn hình game đang mở</div>
+          <div class="big" id="gameClients">0</div>
+          <div class="muted" id="gameHint"></div>
+          <ul class="screens" id="screens"></ul>
+        </div>
+        <div class="card">
+          <div class="label">Giọng AI</div>
+          <div class="big" id="ttsProvider">…</div>
+          <div class="muted" id="ttsInfo"></div>
+          <div class="err" id="ttsErr"></div>
+        </div>
+        <div class="card">
+          <div class="label">Tình tiết</div>
+          <div class="big" id="epState">Không có</div>
+          <div class="bar"><div id="epFill"></div></div>
+          <div class="muted" id="epInfo"></div>
+        </div>
+        <div class="card">
+          <div class="label">Máy chủ</div>
+          <div class="big" id="uptime">…</div>
+          <div class="muted" id="epm"></div>
+        </div>
+      </div>
+
+      <div class="grid kpis" id="kpis"></div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="head"><h2>Mục tiêu</h2><span class="muted" id="goalLvl"></span></div>
+          <div class="goalname" id="goalName"></div>
+          <div class="bar"><div id="goalFill"></div></div>
+          <div class="muted" id="goalText"></div>
+          <h2 class="mt">Người thương Lão</h2>
+          <ol class="donors" id="donors"></ol>
+          <div class="row mt">
+            <button class="btn ghost danger" id="resetStats">Xóa thống kê phiên</button>
+            <button class="btn ghost" id="resetStatsKeep">Xóa thống kê, giữ mục tiêu</button>
+          </div>
+          <h2 class="mt">Cấp người xem <span class="muted">(lưu qua các buổi live)</span></h2>
+          <ol class="donors lvlist" id="viewerLevels"></ol>
+          <div class="row mt">
+            <button class="btn ghost danger" id="resetViewers">Xóa toàn bộ cấp người xem</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="head"><h2>Sự kiện trực tiếp</h2>
+            <label class="chk"><input type="checkbox" id="showRaw"> Dữ liệu thô</label></div>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== EPISODES -->
+    <section id="episodes" class="view">
+      <div class="card live" id="epLive">
+        <div class="live-main">
+          <div class="label">Đang diễn</div>
+          <div class="big" id="epNowTitle">Không có thử thách nào</div>
+          <div class="bar"><div id="epNowFill"></div></div>
+          <div class="muted" id="epNowInfo"></div>
+        </div>
+        <div class="live-side">
+          <label class="switch"><input type="checkbox" id="epAuto"><span></span> Tự động diễn theo lịch</label>
+          <div class="muted" id="epNext"></div>
+          <button class="btn ghost danger" id="epStop">⏹ Dừng thử thách</button>
+        </div>
+      </div>
+      <p class="muted" id="epMsg"></p>
+
+      <h2>Thử thách <span class="muted">— cả làng thả tim / bình luận / follow (không tính quà, không có hậu quả xấu)</span></h2>
+      <div class="grid ep-grid" id="epChallenges"></div>
+      <h2 class="mt">Sự kiện lớn <span class="muted">— chia phe trong bình luận; tự bắt đầu khi làng đủ đông vui</span></h2>
+      <div class="grid ep-grid" id="epBig"></div>
+      <div class="card duel">
+        <h3>🥊 Đấu vui 2 người</h3>
+        <p class="muted">Chọn 2 người vừa tương tác trong 10 phút qua. Cảnh mây bụi hoạt hình, người xem gõ “can” để can, cuối cùng bắt tay làm lành. Chỉ nên chọn người đang vui vẻ tham gia, không dùng để trêu ai.</p>
+        <div class="row"><select id="duelA"></select><b>vs</b><select id="duelB"></select></div>
+        <div class="row"><button class="btn" id="duelGo" type="button">Cho đấu</button><button class="btn ghost sm" id="duelRefresh" type="button">Làm mới danh sách</button></div>
+        <div class="muted" id="duelMsg"></div>
+      </div>
+
+      <h2 class="mt">Cảnh đời thường <span class="muted">— diễn ngắn, xoay vòng theo lịch</span></h2>
+      <div class="grid ep-grid" id="epScenes"></div>
+      <h2 class="mt">Khi có người tặng quà <span class="muted">— camera quay vào người tặng, quà càng lớn càng xịn (chỉ admin thấy bảng này)</span></h2>
+      <div class="card">
+        <table class="tiers">
+          <tr><th>Mức (kim cương / lần tặng)</th><th>Người dân mang tới</th><th>Hành động</th></tr>
+          <tr><td>1–4</td><td>Xu may mắn</td><td>Cúi chào, nhún nhảy</td></tr>
+          <tr><td>5–19</td><td>Khoai nướng</td><td>Camera quay vào 4 giây, nhảy một điệu, tim bay</td></tr>
+          <tr><td>20–49</td><td>Nải chuối</td><td>Camera 6 giây, nhảy + đốt pháo, người đứng cạnh vẫy tay, Vàng sủa mừng</td></tr>
+          <tr><td>50–99</td><td>Bánh chưng</td><td>Camera 7 giây + đèn sân khấu, pháo dài, Lão và cả đám đông reo hò</td></tr>
+          <tr><td>100–499</td><td>Bao gạo nếp</td><td>Camera 9 giây + đèn sân khấu, pháo hoa, <b>Cậu Vàng đứng dậy nhảy hiphop cùng người tặng</b></td></tr>
+          <tr><td>500+</td><td>Mâm cỗ hội làng</td><td>Đèn sân khấu, 8 pháo hoa, banner tên người tặng, rồi <b>cả làng mở hội</b> (camera lùi xa, mọi người cùng nhảy)</td></tr>
+        </table>
+        <p class="muted">Mức lấy theo “Mức quà” trong Cài đặt. Màn hình live chỉ ghi chung “🎁 Quà → hiệu ứng mừng hội làng”, không niêm yết giá — tránh bị coi là đổi quà lấy hành động.</p>
+      </div>
+
+      <h2 class="mt">Cậu Vàng & Lão Hạc</h2>
+      <div class="grid ep-grid" id="epActions"></div>
+    </section>
+
+    <!-- ============================== TEST / SIMULATE -->
+    <section id="test" class="view">
+      <div class="grid two">
+        <div class="card">
+          <h2>Giả lập sự kiện TikTok <span class="seed-tag">🌱 seeding</span></h2>
+          <p class="muted">Gửi sự kiện giả vào game (thử nghiệm hoặc seeding). Xu tặng từ đây được tính riêng là <b>xu seeding</b>, không lẫn với xu thật, và <b>không</b> hiện trên bảng xếp hạng / mục tiêu của màn hình live (trừ khi bật trong Cài đặt).</p>
+          <label>Tên người xem <input id="simName" value="Nguyễn Văn A"></label>
+          <div class="row">
+            <label>Quà <input id="simGift" value="Rose"></label>
+            <label>Xu/quà <input id="simDiamonds" type="number" value="1" min="1"></label>
+            <label>Số lượng <input id="simCount" type="number" value="1" min="1"></label>
+          </div>
+          <div class="row wrap">
+            <button class="btn" data-sim="gift">🎁 Tặng quà</button>
+            <button class="btn ghost" data-preset="1">Rose (1)</button>
+            <button class="btn ghost" data-preset="10">Donut (30)</button>
+            <button class="btn ghost" data-preset="99">Hoa lớn (99)</button>
+            <button class="btn ghost" data-preset="1000">Siêu quà (1000)</button>
+          </div>
+          <label>Bình luận <input id="simText" value="Vàng ơi!"></label>
+          <div class="row wrap">
+            <button class="btn" data-sim="chat">💬 Bình luận</button>
+            <button class="btn ghost" data-sim="like">❤️ Thả tim</button>
+            <button class="btn ghost" data-sim="follow">➕ Follow</button>
+            <button class="btn ghost" data-sim="share">🔁 Chia sẻ</button>
+            <button class="btn ghost" data-sim="join">👋 Vào live</button>
+          </div>
+          <div class="row wrap mt">
+            <button class="btn ghost" id="burst">⚡ Dồn dập 10 quà</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Điều khiển nhân vật</h2>
+          <label>Cho Lão Hạc nói <textarea id="sayText" rows="3">Bà con cô bác ơi, thương lão già này với!</textarea></label>
+          <div class="row wrap">
+            <button class="btn" id="sayGame">🗣️ Nói trong game</button>
+            <button class="btn ghost" id="sayHere">🎧 Nghe thử ở đây</button>
+          </div>
+          <div class="row wrap mt">
+            <button class="btn ghost" data-action="bark">🐶 Cậu Vàng sủa</button>
+            <button class="btn ghost" data-action="thank">🙏 Lão vái tạ ơn</button>
+            <button class="btn ghost" data-action="cheer">🎉 Cả làng reo</button>
+            <button class="btn ghost" data-action="villager">🚶 Thêm người qua đường</button>
+          </div>
+          <h2 class="mt">Webhook</h2>
+          <p class="muted">Nếu không dùng WebSocket, tạo Action “Webhook” trong TikFinity gọi tới địa chỉ này:</p>
+          <code class="copy" id="hookUrl"></code>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== SETTINGS -->
+    <section id="settings" class="view">
+      <form id="cfgForm" class="grid two">
+        <div class="card">
+          <h2>Kết nối bằng username</h2>
+          <label>Euler Stream API key (không bắt buộc) <input name="direct.signApiKey" type="password" autocomplete="off" placeholder="để trống = dùng miễn phí"></label>
+          <p class="muted">Kết nối theo username dùng máy chủ ký của Euler Stream. Gói miễn phí đủ cho 1 buổi live; nếu hay bị lỗi giới hạn, tạo API key ở eulerstream.com và dán vào đây.</p>
+
+          <h2 class="mt">TikFinity</h2>
+          <label class="chk"><input type="checkbox" name="tikfinity.enabled"> Bật kết nối WebSocket</label>
+          <label>Địa chỉ WebSocket <input name="tikfinity.url" placeholder="ws://localhost:21213/"></label>
+          <p class="muted">Mở TikFinity desktop, kết nối với live TikTok của bạn. Mặc định TikFinity mở WebSocket ở cổng 21213. Dùng Mac: bật kết nối bằng username (Tổng quan), hoặc chạy TikFinity trên máy Windows và đổi địa chỉ thành ws://&lt;IP máy Windows&gt;:21213/.</p>
+
+          <h2 class="mt">Game</h2>
+          <label>Tiêu đề <input name="game.title"></label>
+          <label>Chữ trên cổng làng <input name="game.plaque"></label>
+          <div class="row">
+            <label>Lão tự nói sau (giây im lặng) <input type="number" name="game.idleLineSeconds" min="10"></label>
+            <label>Thanh "vui" giảm (%/phút) <input type="number" name="game.moodDecayPerMinute" min="0" step="0.5"></label>
+          </div>
+          <div class="row">
+            <label>Mốc tim để cảm ơn <input type="number" name="game.likeMilestone" min="0"></label>
+            <label>Số người qua lại <input type="number" name="game.ambientVillagers" min="0" max="15"></label>
+            <label>Tốc độ đi (1 = chậm cũ) <input type="number" name="game.walkSpeed" min="0.6" max="2.5" step="0.05"></label>
+          </div>
+          <div class="row">
+            <label class="chk"><input type="checkbox" name="game.animals"> Người dắt trâu, ôm heo, chăn vịt đi qua</label>
+            <label>Tỉ lệ (0–1) <input type="number" name="game.animalChance" min="0" max="1" step="0.05"></label>
+          </div>
+          <label class="chk"><input type="checkbox" name="game.thankJoins"> Lão chào người mới vào live</label>
+          <div class="row">
+            <label>Tim/phút để Vàng nhảy <input type="number" name="game.danceLikes" min="0"></label>
+            <label>Xu/phút để Vàng nhảy <input type="number" name="game.danceDiamonds" min="1"></label>
+            <label>Thời gian nhảy (giây) <input type="number" name="game.danceSeconds" min="5"></label>
+          </div>
+          <div class="row">
+            <label>Tối đa người xem đứng sau Lão <input type="number" name="game.maxNamedVillagers" min="0" max="200"></label>
+            <label>Lão than thở khi vắng người (giây không ai tương tác) <input type="number" name="game.lamentSeconds" min="20" step="10"></label>
+            <label>Người xem rời đi sau (giây không tương tác) <input type="number" name="game.crowdStaySeconds" min="30" step="30"></label>
+            <label>Số con gà <input type="number" name="game.chickens" min="0" max="12"></label>
+            <label>Vàng ngủ sau (giây) <input type="number" name="game.dogNapSeconds" min="20"></label>
+          </div>
+          <label class="chk"><input type="checkbox" name="game.showSeedOnStream"> Hiện xu seeding trên bảng xếp hạng / mục tiêu của màn hình live <span class="muted">(không nên: người xem sẽ tưởng là quà thật)</span></label>
+          <label class="chk"><input type="checkbox" name="game.greetPassers"> Lão chào người xem đi ngang qua</label>
+          <label>Từ cấm (không hiện, không đọc — tên &amp; bình luận; đúng chính tả có dấu, phẩy) <input name="game.blockedWords" data-list></label>
+          <label>Từ khóa làm Cậu Vàng sủa (phẩy) <input name="game.barkKeywords" data-list></label>
+          <label>Từ khóa gọi Lão (phẩy) <input name="game.callKeywords" data-list></label>
+        </div>
+        <div class="card">
+          <h2>Giọng AI</h2>
+          <label>Nhà cung cấp
+            <select name="tts.provider">
+              <option value="google">Google (miễn phí, giọng nữ)</option>
+              <option value="fpt">FPT.AI (giọng Việt, có giọng nam)</option>
+              <option value="elevenlabs">ElevenLabs (chất lượng cao)</option>
+              <option value="openai">OpenAI TTS (điều khiển được giọng ông lão)</option>
+              <option value="browser">Giọng của trình duyệt</option>
+              <option value="off">Tắt tiếng (chỉ phụ đề)</option>
+            </select>
+          </label>
+          <div class="row">
+            <label>Tốc độ đọc (1 = bình thường, cao = nhanh; dưới 1 = chậm và trầm) <input type="number" name="tts.rate" min="0.5" max="2" step="0.02"></label>
+            <label>Âm lượng <input type="number" name="tts.volume" min="0" max="1" step="0.05"></label>
+            <label>Hàng chờ tối đa <input type="number" name="tts.maxQueue" min="1" max="20"></label>
+          </div>
+          <label class="chk"><input type="checkbox" name="tts.readChat"> Đọc bình luận</label>
+          <fieldset data-for="fpt"><legend>FPT.AI</legend>
+            <label>API key <input name="tts.fptApiKey" type="password" autocomplete="off"></label>
+            <label>Giọng
+              <select name="tts.fptVoice">
+                <option value="leminh">leminh — nam miền Bắc</option>
+                <option value="giahuy">giahuy — nam miền Trung</option>
+                <option value="minhquang">minhquang — nam miền Nam</option>
+                <option value="banmai">banmai — nữ miền Bắc</option>
+                <option value="lannhi">lannhi — nữ miền Nam</option>
+                <option value="myan">myan — nữ miền Trung</option>
+              </select></label>
+          </fieldset>
+          <fieldset data-for="elevenlabs"><legend>ElevenLabs</legend>
+            <label>API key <input name="tts.elevenApiKey" type="password" autocomplete="off"></label>
+            <label>Voice ID <input name="tts.elevenVoiceId"></label>
+            <label>Model <input name="tts.elevenModel"></label>
+          </fieldset>
+          <fieldset data-for="openai"><legend>OpenAI</legend>
+            <label>API key <input name="tts.openaiApiKey" type="password" autocomplete="off"></label>
+            <div class="row">
+              <label>Voice <input name="tts.openaiVoice"></label>
+              <label>Model <input name="tts.openaiModel"></label>
+            </div>
+            <label>Chỉ dẫn giọng <textarea name="tts.openaiInstructions" rows="3"></textarea></label>
+          </fieldset>
+          <div class="row wrap">
+            <button type="button" class="btn ghost" id="ttsTest">🎧 Nghe thử giọng</button>
+          </div>
+
+          <h2 class="mt">Địa chủ của làng</h2>
+          <label class="chk"><input type="checkbox" name="landlord.enabled"> Người tặng nhiều nhất buổi live thành Địa chủ (chỗ đứng riêng, lính che lọng, quạt)</label>
+          <label>Cần tối thiểu (kim cương thật) <input type="number" name="landlord.minDiamonds" min="1"></label>
+
+          <h2 class="mt">Ông Giáo đố chữ</h2>
+          <label class="chk"><input type="checkbox" name="quiz.enabled"> Tự ra đố theo lịch</label>
+          <div class="row">
+            <label>Mỗi (phút, 0 = chỉ bấm tay) <input type="number" name="quiz.everyMinutes" min="0" step="0.5"></label>
+            <label>Thời gian (giây) <input type="number" name="quiz.seconds" min="20"></label>
+            <label>Thưởng kinh nghiệm <input type="number" name="quiz.winXp" min="0" step="5"></label>
+          </div>
+          <label>Bộ từ đố (mỗi dòng một từ / cụm từ, 6–20 chữ cái) <textarea id="quizWords" rows="6"></textarea></label>
+
+          <h2 class="mt">Sự kiện lớn</h2>
+          <label class="chk"><input type="checkbox" name="bigEvents.enabled"> Tự bắt đầu khi làng đủ đông vui</label>
+          <div class="row">
+            <label>Ngưỡng điểm (tim 1, bình luận 3, follow 10) <input type="number" name="bigEvents.threshold" min="10"></label>
+            <label>Trong (giây) <input type="number" name="bigEvents.windowSeconds" min="30"></label>
+            <label>Nghỉ giữa 2 lần (phút) <input type="number" name="bigEvents.cooldownMinutes" min="1" step="0.5"></label>
+          </div>
+          <div class="row">
+            <label>Kéo co: thắng khi hơn (điểm) <input type="number" name="bigEvents.tug.target" min="10"></label>
+            <label>Giây <input type="number" name="bigEvents.tug.seconds" min="20"></label>
+          </div>
+          <div class="row">
+            <label>Đua thuyền: về đích (điểm) <input type="number" name="bigEvents.boat.target" min="10"></label>
+            <label>Giây <input type="number" name="bigEvents.boat.seconds" min="20"></label>
+          </div>
+          <div class="row">
+            <label>Đèn trời: mục tiêu (điểm) <input type="number" name="bigEvents.lantern.target" min="10"></label>
+            <label>Giây <input type="number" name="bigEvents.lantern.seconds" min="20"></label>
+            <label>Đập niêu (giây) <input type="number" name="bigEvents.niu.seconds" min="20"></label>
+          </div>
+          <label>Thưởng kinh nghiệm cho mỗi người trong đội thắng <input type="number" name="bigEvents.winXp" min="0" step="5"></label>
+          <label class="chk"><input type="checkbox" name="bigEvents.giftsCount"> Tính cả quà vào điểm phe <span class="muted">(kiểu PK — mặc định tắt cho an toàn chính sách)</span></label>
+
+          <h2 class="mt">Tình tiết</h2>
+          <label class="chk"><input type="checkbox" name="episodes.enabled"> Tự động diễn tình tiết</label>
+          <div class="row">
+            <label>Thử thách mỗi (phút) <input type="number" name="episodes.everyMinutes" min="1" step="0.5"></label>
+            <label>Ông Giáo mỗi (phút, 0 = tắt) <input type="number" name="episodes.ongGiaoMinutes" min="0" step="0.5"></label>
+            <label>Trẻ con mỗi (phút) <input type="number" name="episodes.kidsMinutes" min="0" step="0.5"></label>
+          </div>
+          <div class="row">
+            <label class="chk"><input type="checkbox" name="episodes.quan.enabled"> Quan huyện</label>
+            <label>Cần (điểm) <input type="number" name="episodes.quan.target" min="1"></label>
+            <label>Giây <input type="number" name="episodes.quan.seconds" min="15"></label>
+          </div>
+          <div class="row">
+            <label class="chk"><input type="checkbox" name="episodes.tax.enabled"> Hội làng</label>
+            <label>Cần (điểm) <input type="number" name="episodes.tax.target" min="1"></label>
+            <label>Giây <input type="number" name="episodes.tax.seconds" min="15"></label>
+          </div>
+          <div class="row">
+            <label class="chk"><input type="checkbox" name="episodes.binhtu.enabled"> Binh Tư</label>
+            <label>Cần (điểm) <input type="number" name="episodes.binhtu.target" min="1"></label>
+            <label>Giây <input type="number" name="episodes.binhtu.seconds" min="15"></label>
+          </div>
+          <p class="muted">Cảnh đời thường (xoay vòng theo lịch "Trẻ con mỗi … phút"):</p>
+          <div class="row wrap">
+            <label class="chk"><input type="checkbox" name="episodes.scenes.kids"> Trẻ con chạy</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.kidsHug"> Bế Vàng</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.kidsBall"> Chơi bóng</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.herd"> Lùa gà</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.fight"> Kéo co</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.rain"> Mưa rào</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.kite"> Thả diều</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.butterflies"> Đuổi bướm</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.scuffle"> Hàng xóm cãi nhau</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.dogChase"> Vàng dí cắn</label>
+            <label class="chk"><input type="checkbox" name="episodes.scenes.quay"> Quẩy trẩy hội</label>
+          </div>
+          <p class="muted">Điểm thử thách: mỗi tim = 1, bình luận = 5 (bình luận “đuổi” với Binh Tư = 10), follow / chia sẻ = 10. <b>Quà không được tính</b>, và hết giờ mà chưa đủ điểm thì không có chuyện gì xấu xảy ra — đúng chính sách LIVE của TikTok (không ép tặng quà).</p>
+          <label>Từ khóa đuổi Binh Tư (phẩy) <input name="episodes.binhtu.keywords" data-list></label>
+          <h2 class="mt">Giọng nhân vật phụ</h2>
+          <div class="row">
+            <label>Tốc độ <input type="number" name="tts.npcRate" min="0.5" max="1.5" step="0.02"></label>
+            <label>FPT voice <input name="tts.npcFptVoice"></label>
+            <label>OpenAI voice <input name="tts.npcOpenaiVoice"></label>
+          </div>
+          <label>ElevenLabs voice ID <input name="tts.npcElevenVoiceId"></label>
+
+          <h2 class="mt">Cấp người xem</h2>
+          <p class="muted">Điểm kinh nghiệm cho mỗi hành động. Cấp càng cao nhân vật càng xịn (khăn → dải lụa → áo choàng → vòng sáng → vương miện) và đứng càng gần Lão (cấp 3+ hàng đầu, cấp 5+ chỗ VIP).</p>
+          <div class="row wrap">
+            <label>Vào live (30 phút/lần) <input type="number" name="levels.xp.join" min="0"></label>
+            <label>Bình luận (15 giây/lần) <input type="number" name="levels.xp.chat" min="0"></label>
+            <label>Mỗi 10 tim <input type="number" name="levels.xp.per10Likes" min="0"></label>
+          </div>
+          <div class="row wrap">
+            <label>Follow <input type="number" name="levels.xp.follow" min="0"></label>
+            <label>Chia sẻ <input type="number" name="levels.xp.share" min="0"></label>
+            <label>Hội viên <input type="number" name="levels.xp.subscribe" min="0"></label>
+            <label>Mỗi kim cương <input type="number" name="levels.xp.perDiamond" min="0" step="0.5"></label>
+          </div>
+          <label>Danh hiệu theo cấp (tên | điểm cần, cấp 1 → 6) <textarea id="levelsText" rows="6"></textarea></label>
+
+          <h2 class="mt">Mục tiêu (tên | số xu)</h2>
+          <textarea id="goalsText" rows="6"></textarea>
+          <h2 class="mt">Mức quà (xu tối thiểu | vật phẩm | tên | big)</h2>
+          <p class="muted">Vật phẩm: Coin, Khoai, Chuoi, BanhChung, Gao, Xuong. Thêm “big” để bật màn ăn mừng.</p>
+          <textarea id="tiersText" rows="7"></textarea>
+        </div>
+        <div class="savebar">
+          <span class="muted" id="saveMsg"></span>
+          <button type="button" class="btn ghost" id="cfgReload">Hoàn tác</button>
+          <button type="submit" class="btn">💾 Lưu cài đặt</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============================== LINES -->
+    <section id="lines" class="view">
+      <div class="card">
+        <h2>Câu thoại của Lão Hạc</h2>
+        <p class="muted">Mỗi dòng là một câu, game chọn ngẫu nhiên. Biến: <code>{name}</code> tên người xem, <code>{gift}</code> tên quà, <code>{count}</code> số lượng, <code>{item}</code> vật phẩm, <code>{goal}</code> mục tiêu.</p>
+        <div class="grid two" id="linesGrid"></div>
+        <div class="savebar">
+          <span class="muted" id="linesMsg"></span>
+          <button class="btn ghost danger" id="linesReset">Khôi phục mặc định</button>
+          <button class="btn" id="linesSave">💾 Lưu câu thoại</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

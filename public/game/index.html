@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lão Hạc & Cậu Vàng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;800&family=Pattaya&family=Noto+Serif:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "three": "/vendor/three/build/three.module.js", "three/addons/": "/vendor/three/examples/jsm/" } }
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <div id="ui">
+    <header class="panel goal">
+      <div class="title" id="title">Lão Hạc & Cậu Vàng</div>
+      <div class="goal-row"><span id="goalName">…</span><span class="lvl" id="goalLevel"></span></div>
+      <div class="bar"><div class="fill" id="goalFill"></div><span id="goalText"></span></div>
+      <div class="needs">
+        <div class="need"><span class="ic">😊</span><span>Lão vui</span><div class="mini"><div id="hungerLao"></div></div></div>
+        <div class="need"><span class="ic">🐶</span><span>Vàng vui</span><div class="mini"><div id="hungerDog" class="dog"></div></div></div>
+      </div>
+    </header>
+
+    <aside class="panel board">
+      <div class="bd-head"><h3 id="bdTitle">Bạn của làng</h3><span class="bd-dots" id="bdDots"></span></div>
+      <ol id="top"></ol>
+      <div class="bd-foot" id="bdFoot"></div>
+    </aside>
+
+    <aside class="panel guide">
+      <h3>Cách chơi</h3>
+      <ul id="guideList"></ul>
+    </aside>
+
+    <section id="challenge" class="panel challenge" hidden>
+      <div class="ch-title" id="chTitle"></div>
+      <div class="ch-sub" id="chSub"></div>
+      <div class="bar"><div class="fill" id="chFill"></div><span id="chText"></span></div>
+      <div class="ch-timer" id="chTimer"></div>
+    </section>
+
+    <section id="teams" class="panel teams" hidden>
+      <div class="tm-title" id="tmTitle"></div>
+      <div class="tm-hint" id="tmHint"></div>
+      <div id="tmRows"></div>
+      <div class="ch-timer" id="tmTimer"></div>
+    </section>
+    <section id="quiz" class="panel quiz" hidden>
+      <div class="qz-title" id="qzTitle">📜 Ông Giáo đố chữ</div>
+      <div class="qz-tiles" id="qzTiles"></div>
+      <div class="qz-hint" id="qzHint"></div>
+      <div class="qz-foot"><span id="qzInfo"></span><span class="ch-timer" id="qzTimer"></span></div>
+      <div class="qz-wrong" id="qzWrong"></div>
+    </section>
+    <div id="bigMeter" hidden><span class="bm-ic">⚡</span><div class="bm-tx"><b id="bmTitle">Sự kiện lớn</b><span id="bmSub"></span></div><div class="bm-bar"><div id="bmFill"></div></div></div>
+    <div id="aiTag">🤖 Giọng nhân vật do AI đọc · game tương tác</div>
+    <section id="poem" class="panel poem" hidden><div class="pm-title">📜 Thơ ông Giáo</div><div id="pmLines"></div></section>
+    <div id="honor"></div>
+    <div id="commentary" hidden><span class="cm-who">👴 Lão Hạc</span><span id="cmText"></span></div>
+
+    <div id="feed"></div>
+    <div id="labels"></div>
+    <div id="hearts"></div>
+    <div id="banner" class="banner"></div>
+    <div id="confetti"></div>
+    <div id="loading">Đang dựng làng…</div>
+    <button id="soundGate" hidden>🔊 Bấm để bật âm thanh</button>
+    <div id="conn" title="Kết nối máy chủ"></div>
+    <div id="muteTag" hidden title="Một màn hình khác đang phát tiếng — màn hình này chỉ hiện phụ đề">🔇 Màn hình phụ</div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
